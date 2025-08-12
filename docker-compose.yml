@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # Redbird Proxy
+  proxy:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+      - PROXY_PORT=80
+      - PROXY_HOST=0.0.0.0
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=3000
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=4000
+      - FETCH_DATA_HOST=fetch-data
+      - FETCH_DATA_PORT=2000
+    depends_on:
+      - frontend
+      - backend
+      - fetch-data
+    networks:
+      - btl-network
+    restart: unless-stopped
+
+  # Frontend React App
+  frontend:
+    build: ./Frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://localhost/api
+      - VITE_AUTH_URL=http://localhost/auth
+    networks:
+      - btl-network
+    restart: unless-stopped
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+
+  # Backend API
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+    networks:
+      - btl-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads
+      - ./backend/reports:/app/reports
+
+  # Fetch Data Service
+  fetch-data:
+    build: ./fetch_data
+    ports:
+      - "2000:2000"
+    environment:
+      - NODE_ENV=production
+      - PORT=2000
+    networks:
+      - btl-network
+    restart: unless-stopped
+    volumes:
+      - ./fetch_data:/app
+      - /app/node_modules
+
+  # MySQL Database (if needed)
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=SCLWebPortal
+      - MYSQL_USER=btluser
+      - MYSQL_PASSWORD=btlpassword
+    networks:
+      - btl-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+networks:
+  btl-network:
+    driver: bridge
+
+volumes:
+  mysql_data: 

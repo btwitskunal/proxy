@@ -1,0 +1,23 @@
+{
+  "name": "btl-project-proxy",
+  "version": "1.0.0",
+  "description": "Redbird reverse proxy for BTL Project services",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js",
+    "dev": "nodemon proxy.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["proxy", "reverse-proxy", "redbird", "nodejs"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redbird": "^1.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 
