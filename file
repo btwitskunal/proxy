@@ -1,0 +1,33 @@
+# Proxy Server Configuration
+PROXY_PORT=80
+PROXY_HOST=0.0.0.0
+ 
+# SSL Configuration (set SSL_ENABLED=true to enable)
+SSL_ENABLED=false
+SSL_PORT=443
+SSL_KEY_PATH=/path/to/private.key
+SSL_CERT_PATH=/path/to/certificate.crt
+ 
+# Frontend Service Configuration
+FRONTEND_PORT=3000
+FRONTEND_HOST=localhost
+FRONTEND_ENABLED=true
+ 
+# Backend Service Configuration
+BACKEND_PORT=4000
+BACKEND_HOST=localhost
+BACKEND_ENABLED=true
+ 
+# Fetch Data Service Configuration
+FETCH_DATA_PORT=2000
+FETCH_DATA_HOST=localhost
+FETCH_DATA_ENABLED=true
+ 
+# Security Configuration
+RATE_LIMIT_ENABLED=false
+ 
+# Logging Configuration
+LOG_LEVEL=info
+LOGGING_ENABLED=true
+ 
+ 
