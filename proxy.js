@@ -36,8 +36,9 @@ const routes = [];
 // Frontend routes
 if (isServiceEnabled('frontend')) {
   const frontendTarget = buildTargetUrl('frontend');
+  const sourceUrl = `http://localhost:${config.server.port}${config.routes.frontend.source}`;
   routes.push({
-    source: config.routes.frontend.source,
+    source: sourceUrl,
     target: frontendTarget,
     options: config.routes.frontend.options
   });
@@ -49,8 +50,9 @@ if (isServiceEnabled('backend')) {
   
   Object.keys(config.routes.backend).forEach(routeKey => {
     const route = config.routes.backend[routeKey];
+    const sourceUrl = `http://localhost:${config.server.port}${route.source}`;
     routes.push({
-      source: route.source,
+      source: sourceUrl,
       target: backendTarget,
       options: route.options
     });
@@ -60,8 +62,9 @@ if (isServiceEnabled('backend')) {
 // Fetch data routes
 if (isServiceEnabled('fetchData')) {
   const fetchDataTarget = buildTargetUrl('fetchData');
+  const sourceUrl = `http://localhost:${config.server.port}${config.routes.fetchData.source}`;
   routes.push({
-    source: config.routes.fetchData.source,
+    source: sourceUrl,
     target: fetchDataTarget,
     options: config.routes.fetchData.options
   });
@@ -77,78 +80,13 @@ routes.forEach(route => {
   }
 });
 
-// Health check for the proxy itself
-proxy.app.get('/proxy-health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    service: 'Redbird Proxy',
-    version: '1.0.0',
-    config: {
-      port: config.server.port,
-      ssl: config.server.ssl.enabled,
-      services: Object.keys(config.services).filter(service => isServiceEnabled(service))
-    },
-    routes: routes.map(r => ({ source: r.source, target: r.target }))
-  });
-});
+// Note: Health check endpoints removed due to Redbird API limitations
+// For health checks, you can monitor the proxy by checking if routes are registered
+// or create a separate Express server for health endpoints
 
-// Service health check endpoint
-proxy.app.get('/services-health', async (req, res) => {
-  const healthChecks = {};
-  
-  // Check each service health
-  for (const [serviceName, serviceConfig] of Object.entries(config.services)) {
-    if (!serviceConfig.enabled) {
-      healthChecks[serviceName] = { status: 'disabled' };
-      continue;
-    }
-    
-    try {
-      const targetUrl = buildTargetUrl(serviceName);
-      const healthUrl = `${targetUrl}${serviceConfig.healthCheck}`;
-      
-      // Simple health check (you might want to use a proper HTTP client)
-      healthChecks[serviceName] = {
-        status: 'checking',
-        target: targetUrl,
-        healthCheck: healthUrl
-      };
-    } catch (error) {
-      healthChecks[serviceName] = {
-        status: 'error',
-        error: error.message
-      };
-    }
-  }
-  
-  res.json({
-    timestamp: new Date().toISOString(),
-    services: healthChecks
-  });
-});
-
-// Error handling
-proxy.on('error', (err, req, res) => {
-  console.error('🚨 Proxy error:', err);
-  if (res && !res.headersSent) {
-    res.status(500).json({
-      error: 'Proxy error',
-      message: err.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// Request logging (if enabled)
-if (config.logging.enabled) {
-  proxy.on('request', (req, res) => {
-    const logLevel = config.logging.level;
-    if (logLevel === 'debug' || logLevel === 'info') {
-      console.log(`${new Date().toISOString()} - ${req.method} ${req.url} -> ${req.headers.host}`);
-    }
-  });
-}
+// Note: Event handlers removed due to Redbird API limitations
+// Error handling and logging would need to be implemented differently
+// or through the underlying HTTP server if accessible
 
 // Graceful shutdown
 function gracefulShutdown(signal) {
@@ -198,7 +136,4 @@ routes.forEach(route => {
   console.log(`   ${route.source} -> ${route.target}`);
 });
 
-console.log('\n🔍 Health Checks:');
-console.log(`   Proxy: http://localhost:${config.server.port}/proxy-health`);
-console.log(`   Services: http://localhost:${config.server.port}/services-health`);
 console.log('\n✨ Proxy is ready!'); 
