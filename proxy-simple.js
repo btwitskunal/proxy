@@ -14,7 +14,7 @@ proxy.register('http://localhost:8080/', 'http://localhost:5173', {
   changeOrigin: true,
   ws: true, // Enable WebSocket support for Vite HMR
 });
-console.log('✅ Registered route: http://localhost/ -> http://localhost:3000');
+console.log('✅ Registered route: http://localhost/ -> http://localhost:5173');
 
 // Backend API routes
 proxy.register('http://localhost:8080/api', 'http://localhost:4000', {
